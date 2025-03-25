@@ -1,0 +1,68 @@
+//File33. Дан файл целых чисел. Удалить из него все элементы с четными номерами.
+#include <iostream>
+#include <fstream>
+#include <vector>
+using namespace std;
+
+int main() {
+    setlocale(LC_ALL, "ru");
+    string vfile = "num1.bin";
+    ofstream bebe(vfile, ios::binary);
+    if (!bebe) {
+        cout << "Невозможно открыть файл" << endl;
+        return 1;
+    }
+    int n;
+    cout << "Введите количество чисел, которое нужно записать в файл: ";
+    cin >> n;
+    vector<int> chisla(n);
+    cout << "Введите " << n << " чисел: ";
+    for (int i = 0; i < n; ++i) {
+        cin >> chisla[i];
+    }
+    bebe.write((char*)(chisla.data()), n * sizeof(int));
+    bebe.close();
+    ifstream bebechit(vfile, ios::binary);
+    if (!bebechit) {
+        cout << "Невозможно открыть файл" << endl;
+        return 1;
+    }
+    int elem;
+    cout << "Содержимое файла: ";
+    while (bebechit.read((char*)(&elem), sizeof(int))) {
+        cout << elem << " ";
+    }
+    bebechit.clear();
+    bebechit.seekg(0, ios::beg);
+    cout << endl;
+    string nfile = "num2.bin";
+    ofstream baba(nfile, ios::binary);
+    if (!baba) {
+        cout << "Невозможно открыть файл" << endl;
+        return 1;
+    }
+    int elem2, i = 1;
+    while (bebechit.read((char*)(&elem2), sizeof(int))) {
+        if (i % 2 != 0) {
+            baba.write((char*)(&elem2), sizeof(int));
+        }
+        i++;
+    }
+    bebechit.close();
+    baba.close();
+    remove(vfile.c_str());
+    rename(nfile.c_str(), vfile.c_str());
+    ifstream bebechit2(vfile, ios::binary);
+    if (!bebechit2) {
+        cout << "Невозможно открыть файл" << endl;
+        return 1;
+    }
+    int elem3;
+    cout << "Содержимое файла после удаления: ";
+    while (bebechit2.read((char*)(&elem3), sizeof(int))) {
+        cout << elem3 << " ";
+    }
+    cout << endl;
+    bebechit2.close();
+    return 0;
+}
