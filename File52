@@ -1,0 +1,106 @@
+//File52. Дана строка S0, целое число N (≤ 4) и N файлов целых чисел с именами S1, …, SN. 
+// Объединить их содержимое в новом файле-архиве с именем S0, используя следующий формат : 
+// в первом элементе файла-архива хранится число N, в следующих N элементах хранится размер
+// (число элементов) каждого из исходных файлов, а затем последовательно размещаются данные 
+// из каждого исходного файла.
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <windows.h>
+using namespace std;
+
+int main() {
+    setlocale(LC_ALL, "ru");
+    SetConsoleOutputCP(1251);
+    SetConsoleCP(1251);
+    string S0;  
+    int N;
+    cout << "Введите имя архивного файла (S0): ";
+    cin >> S0;
+    cout << "Введите количество файлов (N, не более 4): ";
+    cin >> N;
+    if (N < 1 || N > 4) {
+        cout << "Ошибка: N должно быть от 1 до 4." << endl;
+        return 1;
+    }
+    ofstream arhiv(S0, ios::binary);
+    if (!arhiv) {
+        cout << "Oшибка создания архива." << endl;
+        return 1;
+    }
+    arhiv.write((char*)(&N), sizeof(int));
+    string sizefile = "size.bin";
+    ofstream razmery(sizefile, ios::binary);
+    if (!razmery) {
+        cout << "Oшибка создания файла с размерами." << endl;
+        return 1;
+    }
+    string nom = "nom.bin";
+    ofstream nomera(nom, ios::binary);
+    if (!nomera) {
+        cout << "Oшибка создания файла с размерами." << endl;
+        return 1;
+    }
+    for (int i = 0; i < N; ++i) {
+        string fileName;
+        cout << "Введите имя бинарного файла " << i + 1 << " (S" << i + 1 << "): ";
+        cin >> fileName;
+
+        ofstream file(fileName, ios::binary);
+        if (!file) {
+            cout << "Ошибка создания файла: " << fileName << endl;
+            return 1;
+        }
+
+        int count;
+        cout << "Введите количество чисел в файле " << fileName << ": ";
+        cin >> count;
+
+        cout << "Введите " << count << " чисел для файла " << fileName << ": ";
+        for (int j = 0; j < count; ++j) {
+            int num;
+            cin >> num;
+            file.write((char*)(&num), sizeof(int));
+        }
+        file.close();
+        razmery.write((char*)(&count), sizeof(int));
+        ifstream filechit(fileName, ios::binary);
+        if (!filechit) {
+            cout << "Ошибка чтения файла: " << fileName << endl;
+            return 1;
+        }
+        int num;
+        while (filechit.read((char*)(&num), sizeof(int))) {
+            nomera.write((char*)(&num), sizeof(int));
+        }
+        filechit.close();
+    }
+    razmery.close();
+    nomera.close();
+    ifstream razmerychit(sizefile, ios::binary);
+    int n;
+    while (razmerychit.read((char*)(&n), sizeof(int))) {
+        arhiv.write((char*)(&n), sizeof(int));
+    }
+    
+    ifstream nomerachit(nom, ios::binary);
+    int n1;
+    while (nomerachit.read((char*)(&n1), sizeof(int))) {
+        arhiv.write((char*)(&n1), sizeof(int));
+    }
+    arhiv.close();
+    ifstream arhivchit(S0, ios::binary);
+    if (!arhivchit) {
+        cout << "Ошибка открытия архива: " << S0 << endl;
+        return 1;
+    }
+    cout << endl;
+    cout << "Содержимое архива " << S0 << ": ";
+    int elem;
+    while (arhivchit.read((char*)(&elem), sizeof(int))){
+        cout << elem << " ";
+    }
+    arhivchit.close();
+    return 0;
+}
