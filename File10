@@ -1,0 +1,67 @@
+//File10.Дан файл целых чисел.Создать новый файл, содержащий те же элементы, 
+// что и исходный файл, но в обратном порядке.
+#include <iostream>
+#include <fstream>
+#include <vector>
+using namespace std;
+
+int main() {
+    setlocale(LC_ALL, "ru");
+    string file1 = "num1.bin";
+    ofstream bebe(file1, ios::binary);
+    if (!bebe) {
+        cout << "Невозможно открыть файл" << endl;
+        return 1;
+    }
+    int n;
+    cout << "Введите количество чисел, которое нужно записать в файл: ";
+    cin >> n;
+    vector<int> chisla(n);  
+    cout << "Введите "<< n << " чисел: ";
+    for (int i = 0; i < n; ++i) {
+        cin >> chisla[i];
+    }
+    bebe.write((char*)(chisla.data()), n * sizeof(int));
+    bebe.close();
+    cout << "Содержимое первого файла: ";
+    for (int num : chisla) {
+        cout << num << " ";
+    }
+    cout << endl;
+    ifstream bebechit(file1, ios::binary);
+    if (!bebechit) {
+        cout << "Невозможно открыть file1 для чтения";
+        return 1;
+    }
+    bebechit.seekg(0, ios::end);
+    streampos bebesize = bebechit.tellg();
+    bebechit.seekg(0, ios::beg);
+
+    int size = bebesize / sizeof(int);
+    string file2 = "num2.bin";
+    ofstream baba(file2, ios::binary);
+    if (!baba) {
+        cout << "Невозможно открыть файл" << endl;
+        return 1;
+    }
+    int elem;
+    for (int i = 1; i <= n; ++i) {
+        bebechit.seekg(-i * sizeof(int), ios::end);
+        bebechit.read((char*) (&elem), sizeof(int));
+        baba.write((char*)(&elem), sizeof(int));
+    }
+    baba.close();
+    ifstream babachit(file2, ios::binary);
+    if (!babachit) {
+        cout << "Невозможно открыть file1 для чтения";
+        return 1;
+    }
+    int elem2;
+    cout << "Содержимое второго файла: ";
+    while (babachit.read((char*)(&elem2), sizeof(int))) {
+        cout << elem2 << " ";
+    }
+    babachit.close();
+    return 0;
+}
+
