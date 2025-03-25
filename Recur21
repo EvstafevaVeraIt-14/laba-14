@@ -1,0 +1,57 @@
+//Recur21. Вывести значение логического выражения, заданного в виде строки S. Выражение опре
+//деляется следующим образом(«T» — True, «F» — False) :
+//   <выражение> :: = T | F | And(<выражение>, <выражение>) |
+//    Or(<выражение>, <выражение>)
+
+#include <iostream>
+#include <string>
+#include <cctype>
+using namespace std;
+
+bool vyrozhenie(const string& stroka, size_t& pos) {
+    while (pos < stroka.size() && stroka[pos] == ' ') {
+        ++pos;
+    }
+    if (stroka[pos] == 'T') {
+        ++pos; 
+        return true;
+    }
+    else if (stroka[pos] == 'F') {
+        ++pos; 
+        return false;
+    }
+
+    if (stroka.substr(pos, 4) == "And(") {
+        pos += 4; 
+        bool left = vyrozhenie(stroka, pos);
+        ++pos; //запятая
+        bool right = vyrozhenie(stroka, pos);
+        ++pos; //)
+        return left && right;
+    }
+    else if (stroka.substr(pos, 3) == "Or(") {
+        pos += 3;
+        bool left = vyrozhenie(stroka, pos);
+        ++pos; //запятая
+        bool right = vyrozhenie(stroka, pos);
+        ++pos; //)
+        return left || right;
+    }
+}
+
+bool nachalosnulya(const string& stroka) {
+    size_t pos = 0;
+    return vyrozhenie(stroka, pos);
+}
+
+int main() {
+    setlocale(LC_ALL, "ru");
+    string stroka;
+
+    cout << "Введите логическое выражение: ";
+    getline(cin, stroka);
+    bool result = nachalosnulya(stroka);
+    cout << "Результат: " << boolalpha << result << endl;
+    
+    return 0;
+}
